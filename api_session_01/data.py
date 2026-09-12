@@ -70,3 +70,36 @@ BOOKS = [
         "price": 200000
     }
 ]
+
+ORDERS = {
+    "1": {
+        "customer": "An",
+        "book_id": 1,
+        "quantity": 1,
+        "status": "pending"
+    },
+    "2": {
+        "customer": "Binh",
+        "book_id": 3,
+        "quantity": 2,
+        "status": "processing"
+    },
+    "3": {
+        "customer": "Chi",
+        "book_id": 5,
+        "quantity": 1,
+        "status": "shipped"
+    },
+    "4": {
+        "customer": "Dung",
+        "book_id": 7,
+        "quantity": 1,
+        "status": "delivered"
+    },
+    "5": {
+        "customer": "Ha",
+        "book_id": 10,
+        "quantity": 2,
+        "status": "pending"
+    }
+}
