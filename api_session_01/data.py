@@ -71,6 +71,33 @@ BOOKS = [
     }
 ]
 
+BOOKS_OPEN = [
+    {
+        "id": 1,
+        "title": "The Hobbit",
+        "author": "J. R. R. Tolkien",
+        "genre": "Fantasy",
+        "price": 90000,
+        "year": 1937
+    },
+    {
+        "id": 2,
+        "title": "Animal Farm",
+        "author": "George Orwell",
+        "genre": "Satire",
+        "price": 70000,
+        "year": 1945
+    },
+    {
+        "id": 3,
+        "title": "The Great Gatsby",
+        "author": "F. Scott Fitzgerald",
+        "genre": "Fiction",
+        "price": 60000,
+        "year": 1925
+    }
+]
+
 ORDERS = {
     "1": {
         "customer": "An",
