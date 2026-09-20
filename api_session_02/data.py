@@ -1,7 +1,7 @@
 BOOKS = [
     {
         "id": 1,
-        "title": "Pride and Prejudice",
+        "title": "New Title",
         "author": "Jane Austen",
         "genre": "Romance",
         "price": 65000
