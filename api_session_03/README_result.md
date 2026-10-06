@@ -1,3 +1,4 @@
+**NOTE on Bao_cao_review_GitHub: Trần Minh Anh phụ trách tiêu chí số 8, 9**
 # Kết quả thực hành API Session 03
 
 ## Lab 1 — Blog API
