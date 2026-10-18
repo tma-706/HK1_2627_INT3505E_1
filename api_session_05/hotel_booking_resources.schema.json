@@ -1,0 +1,266 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/hotel-booking-resources.schema.json",
+  "title": "Hotel Booking API - Main Resources",
+  "description": "JSON Schema cho 3 resource chính: Hotel, Room và Booking.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/Hotel"
+    },
+    {
+      "$ref": "#/$defs/Room"
+    },
+    {
+      "$ref": "#/$defs/Booking"
+    }
+  ],
+  "$defs": {
+    "Money": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "properties": {
+        "amount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Số tiền theo đơn vị nhỏ nhất của currency. Với VND là số đồng."
+        },
+        "currency": {
+          "type": "string",
+          "enum": [
+            "VND",
+            "USD"
+          ]
+        }
+      }
+    },
+    "Address": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "street",
+        "city",
+        "country"
+      ],
+      "properties": {
+        "street": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "district": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "city": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "country": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$",
+          "description": "Mã quốc gia ISO 3166-1 alpha-2, ví dụ VN."
+        }
+      }
+    },
+    "Hotel": {
+      "title": "Hotel",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "address",
+        "rating",
+        "amenityIds",
+        "checkInTime",
+        "checkOutTime",
+        "createdAt"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^hotel_[a-z0-9]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 150
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "address": {
+          "$ref": "#/$defs/Address"
+        },
+        "rating": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "amenityIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^amenity_[a-z0-9-]+$"
+          }
+        },
+        "checkInTime": {
+          "type": "string",
+          "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$",
+          "description": "Giờ địa phương theo định dạng HH:MM."
+        },
+        "checkOutTime": {
+          "type": "string",
+          "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$",
+          "description": "Giờ địa phương theo định dạng HH:MM."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "Room": {
+      "title": "Room",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "hotelId",
+        "roomNumber",
+        "type",
+        "capacity",
+        "pricePerNight",
+        "status",
+        "createdAt"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^room_[a-z0-9]+$"
+        },
+        "hotelId": {
+          "type": "string",
+          "pattern": "^hotel_[a-z0-9]+$"
+        },
+        "roomNumber": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "standard",
+            "deluxe",
+            "suite",
+            "family"
+          ]
+        },
+        "capacity": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "bedCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6
+        },
+        "pricePerNight": {
+          "$ref": "#/$defs/Money"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "available",
+            "occupied",
+            "maintenance"
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "Booking": {
+      "title": "Booking",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "guestId",
+        "roomId",
+        "checkInDate",
+        "checkOutDate",
+        "guestCount",
+        "status",
+        "totalPrice",
+        "createdAt",
+        "updatedAt"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^booking_[a-z0-9]+$"
+        },
+        "guestId": {
+          "type": "string",
+          "pattern": "^guest_[a-z0-9]+$"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^room_[a-z0-9]+$"
+        },
+        "checkInDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "checkOutDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Phải sau checkInDate; rule này được kiểm tra ở business layer."
+        },
+        "guestCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "confirmed",
+            "checked_in",
+            "checked_out",
+            "cancelled"
+          ]
+        },
+        "totalPrice": {
+          "$ref": "#/$defs/Money"
+        },
+        "specialRequests": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}
