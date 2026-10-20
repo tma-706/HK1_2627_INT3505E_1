@@ -1,0 +1,624 @@
+{
+  "info": {
+    "_postman_id": "cf7f40ff-b106-4275-923a-d344478bb737",
+    "name": "session_05_list-books",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "59037403"
+  },
+  "item": [
+    {
+      "name": "01 - Offset first page",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response contains 3 books\", function () {\r",
+              "    const body = pm.response.json();\r",
+              "\r",
+              "    pm.expect(body.data).to.be.an(\"array\");\r",
+              "    pm.expect(body.data).to.have.lengthOf(3);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Pagination information is correct\", function () {\r",
+              "    const pagination = pm.response.json().pagination;\r",
+              "\r",
+              "    pm.expect(pagination.strategy).to.eql(\"offset\");\r",
+              "    pm.expect(pagination.offset).to.eql(0);\r",
+              "    pm.expect(pagination.limit).to.eql(3);\r",
+              "    pm.expect(pagination.total).to.eql(12);\r",
+              "    pm.expect(pagination.has_next).to.eql(true);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books?strategy=offset&offset=0&limit=3",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ],
+          "query": [
+            {
+              "key": "strategy",
+              "value": "offset"
+            },
+            {
+              "key": "offset",
+              "value": "0"
+            },
+            {
+              "key": "limit",
+              "value": "3"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "02 - Offset second page",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books?strategy=offset&offset=3&limit=3",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ],
+          "query": [
+            {
+              "key": "strategy",
+              "value": "offset"
+            },
+            {
+              "key": "offset",
+              "value": "3"
+            },
+            {
+              "key": "limit",
+              "value": "3"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "03 - Invalid offset",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {\r",
+              "    pm.response.to.have.status(400);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Error is invalid_offset\", function () {\r",
+              "    const body = pm.response.json();\r",
+              "\r",
+              "    pm.expect(body.error).to.eql(\"invalid_offset\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books?strategy=offset&offset=-1&limit=3",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ],
+          "query": [
+            {
+              "key": "strategy",
+              "value": "offset"
+            },
+            {
+              "key": "offset",
+              "value": "-1"
+            },
+            {
+              "key": "limit",
+              "value": "3"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "04 - Filter technology",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"All books are technology books\", function () {\r",
+              "    const body = pm.response.json();\r",
+              "\r",
+              "    pm.expect(body.pagination.total).to.eql(4);\r",
+              "\r",
+              "    body.data.forEach(function (book) {\r",
+              "        pm.expect(book.genre).to.eql(\"technology\");\r",
+              "    });\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books?strategy=offset&genre=technology&offset=0&limit=3",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ],
+          "query": [
+            {
+              "key": "strategy",
+              "value": "offset"
+            },
+            {
+              "key": "genre",
+              "value": "technology"
+            },
+            {
+              "key": "offset",
+              "value": "0"
+            },
+            {
+              "key": "limit",
+              "value": "3"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "05 - Multi-key sort",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Books are sorted by price DESC and title ASC\", function () {\r",
+              "    const books = pm.response.json().data;\r",
+              "\r",
+              "    for (let index = 1; index < books.length; index++) {\r",
+              "        const previous = books[index - 1];\r",
+              "        const current = books[index];\r",
+              "\r",
+              "        pm.expect(\r",
+              "            previous.price >= current.price\r",
+              "        ).to.eql(true);\r",
+              "\r",
+              "        if (previous.price === current.price) {\r",
+              "            pm.expect(\r",
+              "                previous.title.localeCompare(current.title) <= 0\r",
+              "            ).to.eql(true);\r",
+              "        }\r",
+              "    }\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books?strategy=offset&offset=0&limit=12&sort=-price,title",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ],
+          "query": [
+            {
+              "key": "strategy",
+              "value": "offset"
+            },
+            {
+              "key": "offset",
+              "value": "0"
+            },
+            {
+              "key": "limit",
+              "value": "12"
+            },
+            {
+              "key": "sort",
+              "value": "-price,title"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "06 - Invalid sort",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {\r",
+              "    pm.response.to.have.status(400);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Returns invalid sort field error\", function () {\r",
+              "    const body = pm.response.json();\r",
+              "\r",
+              "    pm.expect(body.error).to.eql(\r",
+              "        \"Invalid sort field: unknown\"\r",
+              "    );\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books?strategy=offset&sort=-unknown",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ],
+          "query": [
+            {
+              "key": "strategy",
+              "value": "offset"
+            },
+            {
+              "key": "sort",
+              "value": "-unknown"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "07 - Cursor first page",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Returns 3 books\", function () {\r",
+              "    const body = pm.response.json();\r",
+              "\r",
+              "    pm.expect(body.data).to.be.an(\"array\");\r",
+              "    pm.expect(body.data).to.have.lengthOf(3);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Cursor pagination is correct\", function () {\r",
+              "    const pagination = pm.response.json().pagination;\r",
+              "\r",
+              "    pm.expect(pagination.strategy).to.eql(\"cursor\");\r",
+              "    pm.expect(pagination.limit).to.eql(3);\r",
+              "    pm.expect(pagination.has_more).to.eql(true);\r",
+              "    pm.expect(pagination.next_cursor).to.be.a(\"string\");\r",
+              "    pm.expect(pagination.sort).to.eql(\"-price,title\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"First cursor page has correct IDs\", function () {\r",
+              "    const ids = pm.response.json().data.map(\r",
+              "        book => book.id\r",
+              "    );\r",
+              "\r",
+              "    pm.expect(ids).to.eql([2, 1, 3]);\r",
+              "});\r",
+              "\r",
+              "const body = pm.response.json();\r",
+              "\r",
+              "pm.collectionVariables.set(\r",
+              "    \"nextCursor\",\r",
+              "    body.pagination.next_cursor\r",
+              ");\r",
+              "\r",
+              "pm.collectionVariables.set(\r",
+              "    \"firstPageIds\",\r",
+              "    JSON.stringify(\r",
+              "        body.data.map(book => book.id)\r",
+              "    )\r",
+              ");"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books?strategy=cursor&limit=3&sort=-price,title",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ],
+          "query": [
+            {
+              "key": "strategy",
+              "value": "cursor"
+            },
+            {
+              "key": "limit",
+              "value": "3"
+            },
+            {
+              "key": "sort",
+              "value": "-price,title"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "08 - Cursor next page",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Returns 3 books\", function () {\r",
+              "    const body = pm.response.json();\r",
+              "\r",
+              "    pm.expect(body.data).to.have.lengthOf(3);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Second page has correct IDs\", function () {\r",
+              "    const ids = pm.response.json().data.map(\r",
+              "        book => book.id\r",
+              "    );\r",
+              "\r",
+              "    pm.expect(ids).to.eql([7, 8, 4]);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Second page has no duplicate books\", function () {\r",
+              "    const body = pm.response.json();\r",
+              "\r",
+              "    const firstPageIds = JSON.parse(\r",
+              "        pm.collectionVariables.get(\r",
+              "            \"firstPageIds\"\r",
+              "        )\r",
+              "    );\r",
+              "\r",
+              "    const secondPageIds = body.data.map(\r",
+              "        book => book.id\r",
+              "    );\r",
+              "\r",
+              "    secondPageIds.forEach(function (id) {\r",
+              "        pm.expect(\r",
+              "            firstPageIds.includes(id)\r",
+              "        ).to.eql(false);\r",
+              "    });\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books?strategy=cursor&limit=3&sort=-price,title&cursor=eyJzb3J0IjogIi1wcmljZSx0aXRsZSxpZCIsICJnZW5yZSI6IG51bGwsICJ2YWx1ZXMiOiBbMjUwMDAwLCAiUHl0aG9uIENyYXNoIENvdXJzZSIsIDNdfQ==",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ],
+          "query": [
+            {
+              "key": "strategy",
+              "value": "cursor"
+            },
+            {
+              "key": "limit",
+              "value": "3"
+            },
+            {
+              "key": "sort",
+              "value": "-price,title"
+            },
+            {
+              "key": "cursor",
+              "value": "eyJzb3J0IjogIi1wcmljZSx0aXRsZSxpZCIsICJnZW5yZSI6IG51bGwsICJ2YWx1ZXMiOiBbMjUwMDAwLCAiUHl0aG9uIENyYXNoIENvdXJzZSIsIDNdfQ=="
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "09 - Invalid cursor",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {\r",
+              "    pm.response.to.have.status(400);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Returns invalid_cursor\", function () {\r",
+              "    const body = pm.response.json();\r",
+              "\r",
+              "    pm.expect(body.error).to.eql(\r",
+              "        \"invalid_cursor\"\r",
+              "    );\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books?strategy=cursor&limit=3&cursor=not-a-valid-cursor",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ],
+          "query": [
+            {
+              "key": "strategy",
+              "value": "cursor"
+            },
+            {
+              "key": "limit",
+              "value": "3"
+            },
+            {
+              "key": "cursor",
+              "value": "not-a-valid-cursor"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "10 - Cursor sort mismatch",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {\r",
+              "    pm.response.to.have.status(400);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Returns cursor_sort_mismatch\", function () {\r",
+              "    const body = pm.response.json();\r",
+              "\r",
+              "    pm.expect(body.error).to.eql(\r",
+              "        \"cursor_sort_mismatch\"\r",
+              "    );\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books?strategy=cursor&limit=3&sort=title&cursor={{nextCursor}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ],
+          "query": [
+            {
+              "key": "strategy",
+              "value": "cursor"
+            },
+            {
+              "key": "limit",
+              "value": "3"
+            },
+            {
+              "key": "sort",
+              "value": "title"
+            },
+            {
+              "key": "cursor",
+              "value": "{{nextCursor}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:5000",
+      "type": "string"
+    },
+    {
+      "key": "nextCursor",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "firstPageIds",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}
