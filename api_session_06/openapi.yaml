@@ -1,0 +1,311 @@
+openapi: 3.0.3
+
+info:
+  title: Social Network API
+  version: 1.0.0
+  description: |
+    JWT authentication API.
+    Access tokens are used for protected resources.
+    Refresh tokens are accepted only by `/auth/refresh`.
+
+servers:
+  - url: http://localhost:5000/v1
+    description: Local development server
+
+tags:
+  - name: auth
+    description: Các API liên quan đến xác thực
+  - name: posts
+    description: Các API liên quan đến bài viết
+
+paths:
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: Đăng nhập
+      operationId: login
+      description: |
+        Endpoint public, không yêu cầu access token hoặc scope.
+        Khi đăng nhập thành công, server cấp access token và refresh token.
+      security: []
+      x-required-scopes: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+            example:
+              email: user1@example.com
+              password: Example-Password-123!
+      responses:
+        "200":
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenPair"
+              example:
+                access_token: "<access-token>"
+                refresh_token: "<refresh-token>"
+                token_type: Bearer
+                expires_in: 900
+        "400":
+          description: JSON sai định dạng hoặc thiếu email/password
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: validation_error
+                message: Email and password are required
+        "401":
+          description: |
+            Email không tồn tại hoặc mật khẩu sai. Hai trường hợp trả cùng
+            lỗi `invalid_credentials` để hạn chế account enumeration.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: invalid_credentials
+                message: Email or password is incorrect
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /auth/refresh:
+    post:
+      tags: [auth]
+      summary: Làm mới access token
+      operationId: refreshAccessToken
+      description: |
+        Gửi refresh token qua header `Authorization: Bearer <refresh-token>`.
+        Endpoint không yêu cầu scope nghiệp vụ, nhưng chỉ chấp nhận token loại
+        refresh. Khi refresh-token rotation được áp dụng, token cũ bị vô hiệu
+        hóa và một refresh token mới được trả về.
+      security:
+        - refreshToken: []
+      x-required-scopes: []
+      x-authorization-example: "Bearer <refresh-token>"
+      responses:
+        "200":
+          description: Làm mới token thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenPair"
+              example:
+                access_token: "<new-access-token>"
+                refresh_token: "<new-refresh-token>"
+                token_type: Bearer
+                expires_in: 900
+        "401":
+          description: |
+            Thiếu refresh token, token sai chữ ký, hết hạn, bị thu hồi,
+            hoặc access token được gửi thay cho refresh token.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: invalid_token
+                message: Refresh token is invalid or expired
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /posts/{id}:
+    get:
+      tags: [posts]
+      summary: Lấy một bài viết theo ID
+      operationId: getPostById
+      description: |
+        Yêu cầu JWT access token có scope `posts:read`. Sau khi kiểm tra scope,
+        server tiếp tục kiểm tra visibility, ownership và quan hệ chia sẻ của
+        bài viết để ngăn BOLA.
+      security:
+        - accessToken: []
+      x-required-scopes:
+        - posts:read
+      x-authorization-example: "Bearer <access-token>"
+      parameters:
+        - $ref: "#/components/parameters/PostId"
+      responses:
+        "200":
+          description: Lấy bài viết thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+              example:
+                id: "550e8400-e29b-41d4-a716-446655440000"
+                title: Bài viết đầu tiên
+                content: Đây là nội dung của bài viết đầu tiên.
+                author_id: "2c1f3840-d8ef-4fd8-91cd-164fc02360f8"
+                visibility: public
+                created_at: "2026-10-07T08:00:00Z"
+                updated_at: "2026-10-07T09:00:00Z"
+        "400":
+          description: ID bài viết không phải UUID hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: validation_error
+                message: Post ID must be a valid UUID
+        "401":
+          description: Thiếu access token hoặc access token không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: invalid_token
+                message: Access token is invalid or expired
+        "403":
+          description: Access token hợp lệ nhưng thiếu scope `posts:read`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: insufficient_scope
+                message: Required scope posts:read
+        "404":
+          description: |
+            Bài viết không tồn tại hoặc caller không được phép biết bài viết
+            này tồn tại.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: post_not_found
+                message: Post was not found
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+components:
+  securitySchemes:
+    accessToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token có thời gian sống ngắn.
+    refreshToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT refresh token chỉ được dùng tại `/auth/refresh`; access token
+        không được chấp nhận tại endpoint này.
+
+  parameters:
+    PostId:
+      name: id
+      in: path
+      required: true
+      description: UUID của bài viết
+      example: "550e8400-e29b-41d4-a716-446655440000"
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+          writeOnly: true
+
+    TokenPair:
+      type: object
+      additionalProperties: false
+      required: [access_token, refresh_token, token_type, expires_in]
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+          description: Refresh token của phiên; token mới được cấp khi rotation.
+        token_type:
+          type: string
+          enum: [Bearer]
+        expires_in:
+          type: integer
+          description: Thời gian sống của access token, tính bằng giây.
+
+    Post:
+      type: object
+      additionalProperties: false
+      required: [id, title, content, author_id, visibility, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        content:
+          type: string
+        author_id:
+          type: string
+          format: uuid
+        visibility:
+          type: string
+          enum: [public, followers, private]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Error:
+      type: object
+      additionalProperties: false
+      required: [error, message]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+  responses:
+    RateLimited:
+      description: Quá nhiều request trong một khoảng thời gian
+      headers:
+        Retry-After:
+          description: Số giây cần chờ trước khi thử lại
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: rate_limited
+            message: Too many requests, please try again later
+
+    ServerError:
+      description: Lỗi nội bộ; response không chứa stack trace
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: internal_error
+            message: An unexpected error occurred
