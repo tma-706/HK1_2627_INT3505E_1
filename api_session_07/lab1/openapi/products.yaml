@@ -1,0 +1,268 @@
+openapi: 3.0.3
+
+info:
+  title: Product API
+  version: 1.0.0
+  description: Product CRUD API for SOA Session 07 Lab 1
+
+servers:
+  - url: http://127.0.0.1:5000
+
+paths:
+  /api/v1/products:
+    get:
+      summary: List active products
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Product page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductPage"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+    post:
+      summary: Create a product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductIn"
+      responses:
+        "201":
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/products/{product_id}:
+    parameters:
+      - name: product_id
+        in: path
+        required: true
+        schema:
+          type: integer
+
+    get:
+      summary: Get an active product
+      responses:
+        "200":
+          description: Product found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      summary: Partially update a product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductPatch"
+      responses:
+        "200":
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+    delete:
+      summary: Soft-delete a product
+      responses:
+        "204":
+          description: Product archived
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/products/{product_id}/reserve:
+    parameters:
+      - name: product_id
+        in: path
+        required: true
+        schema:
+          type: integer
+
+    post:
+      summary: Reserve product stock
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReserveIn"
+      responses:
+        "200":
+          description: Stock reserved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - id
+        - sku
+        - name
+        - price_cents
+        - qty_in_stock
+        - archived
+      properties:
+        id:
+          type: integer
+        sku:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        price_cents:
+          type: integer
+        qty_in_stock:
+          type: integer
+        archived:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    ProductIn:
+      type: object
+      required:
+        - sku
+        - name
+        - price_cents
+      properties:
+        sku:
+          type: string
+          minLength: 3
+          maxLength: 32
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+          maxLength: 2000
+        price_cents:
+          type: integer
+          minimum: 0
+        qty_in_stock:
+          type: integer
+          minimum: 0
+          default: 0
+
+    ProductPatch:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        price_cents:
+          type: integer
+          minimum: 0
+
+    ReserveIn:
+      type: object
+      required:
+        - qty
+      properties:
+        qty:
+          type: integer
+          minimum: 1
+
+    ProductPage:
+      type: object
+      required:
+        - items
+        - page
+        - size
+        - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+        page:
+          type: integer
+        size:
+          type: integer
+        total:
+          type: integer
+
+    Error:
+      type: object
+      required:
+        - error
+        - detail
+      properties:
+        error:
+          type: string
+        detail: {}
+
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    Conflict:
+      description: Resource state conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    ValidationError:
+      description: Request validation failed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
