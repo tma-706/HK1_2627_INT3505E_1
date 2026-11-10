@@ -22,8 +22,9 @@ def create_app(test_config=None):
 
     # Nạp model để Flask-Migrate nhìn thấy metadata.
     from . import models  # noqa: F401
-    from .api import products_bp
+    from .api import orders_bp, products_bp
     app.register_blueprint(products_bp)
+    app.register_blueprint(orders_bp)
     register_error_handlers(app)
 
     @app.get("/")

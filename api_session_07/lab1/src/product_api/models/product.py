@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 from sqlalchemy import Boolean, DateTime, Integer, String, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ..extensions import db
 
 
@@ -49,4 +49,7 @@ class Product(db.Model):
         server_default=func.now(),
         onupdate=func.now(),
         nullable=False,
+    )
+    order_items: Mapped[list["OrderItem"]] = relationship(
+        back_populates="product",
     )
