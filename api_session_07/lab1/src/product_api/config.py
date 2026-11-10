@@ -1,8 +1,12 @@
 import os
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-INSTANCE_DIR = PROJECT_ROOT / "instance"
+INSTANCE_DIR = Path(
+    os.environ.get(
+        "INSTANCE_PATH",
+        Path.cwd() / "instance",
+    )
+).resolve()
 
 class Config:
     SECRET_KEY = os.environ.get(
