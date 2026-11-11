@@ -1,0 +1,28 @@
+extends:
+  - spectral:oas
+
+rules:
+  info-contact: off
+  operation-description: off
+  operation-tags: off
+
+  response-204-must-not-have-content:
+    description: A 204 response must not contain a response body.
+    message: "Response 204 must not define content."
+    severity: error
+    given: "$.paths[*][*].responses['204']"
+    then:
+      field: content
+      function: falsy
+
+  book-year-must-be-integer:
+    description: Book.year must match the integer type used by the backend.
+    message: "Book.year must have type integer."
+    severity: error
+    given: "$.components.schemas.Book.properties.year"
+    then:
+      field: type
+      function: enumeration
+      functionOptions:
+        values:
+          - integer
