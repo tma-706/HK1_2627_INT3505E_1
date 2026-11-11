@@ -26,3 +26,30 @@ rules:
       functionOptions:
         values:
           - integer
+
+  response-200-must-have-non-empty-schema:
+    description: Every 200 JSON response must define a non-empty schema.
+    message: "Response 200 must define a non-empty application/json schema."
+    severity: error
+    given: "$.paths[*][*].responses['200']"
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: object
+          required:
+            - content
+          properties:
+            content:
+              type: object
+              required:
+                - application/json
+              properties:
+                application/json:
+                  type: object
+                  required:
+                    - schema
+                  properties:
+                    schema:
+                      type: object
+                      minProperties: 1
