@@ -5,3 +5,7 @@ __pycache__/
 body.json
 test.txt
 .vscode/
+
+instance/
+__pycache__/
+.pytest_cache/
