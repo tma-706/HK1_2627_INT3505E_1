@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="AI Lost &amp; Found — Session 08 Homework" tests="16" time="0.551">
+  <testsuite name="happy-path / 01 — Health check" id="72bcd068-596b-4cd0-88ab-361375cca9f9" timestamp="2026-11-17T09:57:17.533Z" tests="2" failures="0" errors="0" time="0.049">
+    <testcase name="200 OK" time="0.049" classname="HappyPath01HealthCheck"/>
+    <testcase name="service is healthy" time="0.049" classname="HappyPath01HealthCheck"/>
+  </testsuite>
+  <testsuite name="happy-path / 02 — Login seeker" id="fc7c4f4b-0e49-4a81-81f5-81df70ce0cee" timestamp="2026-11-17T09:57:17.533Z" tests="2" failures="0" errors="0" time="0.187">
+    <testcase name="200 OK" time="0.187" classname="HappyPath02LoginSeeker"/>
+    <testcase name="returns seeker token and user schema" time="0.187" classname="HappyPath02LoginSeeker"/>
+  </testsuite>
+  <testsuite name="happy-path / 03 — Create Lost Post" id="56055251-348d-4300-b5f6-5929bc1cff31" timestamp="2026-11-17T09:57:17.533Z" tests="2" failures="0" errors="0" time="0.015">
+    <testcase name="201 Created" time="0.015" classname="HappyPath03CreateLostPost"/>
+    <testcase name="creates a LOST draft" time="0.015" classname="HappyPath03CreateLostPost"/>
+  </testsuite>
+  <testsuite name="happy-path / 04 — Publish Lost Post" id="67cb8e92-1d6d-4a9e-85b4-3c3fca40bcc8" timestamp="2026-11-17T09:57:17.533Z" tests="2" failures="0" errors="0" time="0.016">
+    <testcase name="200 OK" time="0.016" classname="HappyPath04PublishLostPost"/>
+    <testcase name="publishes immediately and queues matching" time="0.016" classname="HappyPath04PublishLostPost"/>
+  </testsuite>
+  <testsuite name="happy-path / 05 — Login finder" id="314c4ae9-0d77-4f20-b333-82d5dd931b3c" timestamp="2026-11-17T09:57:17.533Z" tests="2" failures="0" errors="0" time="0.127">
+    <testcase name="200 OK" time="0.127" classname="HappyPath05LoginFinder"/>
+    <testcase name="returns finder token" time="0.127" classname="HappyPath05LoginFinder"/>
+  </testsuite>
+  <testsuite name="happy-path / 06 — Create Found Post with image" id="d0b0f552-52b3-4028-a417-ffc7421adb49" timestamp="2026-11-17T09:57:17.533Z" tests="2" failures="0" errors="0" time="0.015">
+    <testcase name="201 Created" time="0.015" classname="HappyPath06CreateFoundPostWithImage"/>
+    <testcase name="creates a FOUND draft with media metadata" time="0.015" classname="HappyPath06CreateFoundPostWithImage"/>
+  </testsuite>
+  <testsuite name="happy-path / 07 — Publish Found Post" id="11781482-9a03-40be-bec8-ee3dcaa84869" timestamp="2026-11-17T09:57:17.533Z" tests="2" failures="0" errors="0" time="0.022">
+    <testcase name="200 OK" time="0.022" classname="HappyPath07PublishFoundPost"/>
+    <testcase name="publishes image-backed FOUND post" time="0.022" classname="HappyPath07PublishFoundPost"/>
+  </testsuite>
+  <testsuite name="happy-path / 08 — Get Top 5 matches" id="ae1dbfae-f8c3-4003-ba45-c1ec92e50446" timestamp="2026-11-17T09:57:17.533Z" tests="2" failures="0" errors="0" time="0.025">
+    <testcase name="200 OK" time="0.025" classname="HappyPath08GetTop5Matches"/>
+    <testcase name="returns bounded mock matching results" time="0.025" classname="HappyPath08GetTop5Matches"/>
+  </testsuite>
+  <testsuite name="happy-path / 09 — Create claim" id="cf4c83ed-0be1-4f6e-aa2b-b7615177d000" timestamp="2026-11-17T09:57:17.533Z" tests="2" failures="0" errors="0" time="0.023">
+    <testcase name="201 Created" time="0.023" classname="HappyPath09CreateClaim"/>
+    <testcase name="creates a pending claim" time="0.023" classname="HappyPath09CreateClaim"/>
+  </testsuite>
+  <testsuite name="happy-path / 10 — Get private claim" id="481c2e0b-f65b-49e1-9e7d-f426b08017d8" timestamp="2026-11-17T09:57:17.533Z" tests="2" failures="0" errors="0" time="0.007">
+    <testcase name="200 OK" time="0.007" classname="HappyPath10GetPrivateClaim"/>
+    <testcase name="returns the saved claim schema" time="0.007" classname="HappyPath10GetPrivateClaim"/>
+  </testsuite>
+  <testsuite name="error-cases / 11 — Create post without token" id="7f5e6ee7-8aad-4834-88e3-8500337abccd" timestamp="2026-11-17T09:57:17.533Z" tests="2" failures="0" errors="0" time="0.006">
+    <testcase name="401 Unauthorized" time="0.006" classname="ErrorCases11CreatePostWithoutToken"/>
+    <testcase name="returns protocol auth error" time="0.006" classname="ErrorCases11CreatePostWithoutToken"/>
+  </testsuite>
+  <testsuite name="error-cases / 12 — Lost Post missing description" id="b4c7574b-463f-448b-b5af-108a59cebdb6" timestamp="2026-11-17T09:57:17.533Z" tests="2" failures="0" errors="0" time="0.008">
+    <testcase name="422 Unprocessable Entity" time="0.008" classname="ErrorCases12LostPostMissingDescription"/>
+    <testcase name="returns description schema error" time="0.008" classname="ErrorCases12LostPostMissingDescription"/>
+  </testsuite>
+  <testsuite name="error-cases / 13 — Create Found draft without image" id="fe03fdad-497f-4646-8ceb-cda771b1d496" timestamp="2026-11-17T09:57:17.533Z" tests="2" failures="0" errors="0" time="0.024">
+    <testcase name="201 Created" time="0.024" classname="ErrorCases13CreateFoundDraftWithoutImage"/>
+    <testcase name="image-less Found Post remains a draft" time="0.024" classname="ErrorCases13CreateFoundDraftWithoutImage"/>
+  </testsuite>
+  <testsuite name="error-cases / 14 — Reject publishing Found Post without image" id="51c0daff-e4e7-48e4-a811-3e0cc1567af4" timestamp="2026-11-17T09:57:17.533Z" tests="2" failures="0" errors="0" time="0.006">
+    <testcase name="422 Unprocessable Entity" time="0.006" classname="ErrorCases14RejectPublishingFoundPostWithoutImage"/>
+    <testcase name="enforces Found Post image rule" time="0.006" classname="ErrorCases14RejectPublishingFoundPostWithoutImage"/>
+  </testsuite>
+  <testsuite name="error-cases / 15 — Reject match limit above 10" id="c683a0a9-26ed-4dd4-99ac-bfcc9e9c96a1" timestamp="2026-11-17T09:57:17.533Z" tests="2" failures="0" errors="0" time="0.010">
+    <testcase name="422 Unprocessable Entity" time="0.010" classname="ErrorCases15RejectMatchLimitAbove10"/>
+    <testcase name="enforces Top 10 business rule" time="0.010" classname="ErrorCases15RejectMatchLimitAbove10"/>
+  </testsuite>
+  <testsuite name="error-cases / 16 — Missing post" id="874b653f-ba6e-4bcd-9a97-cdb0d2ee350b" timestamp="2026-11-17T09:57:17.533Z" tests="2" failures="0" errors="0" time="0.011">
+    <testcase name="404 Not Found" time="0.011" classname="ErrorCases16MissingPost"/>
+    <testcase name="returns stable NOT_FOUND body" time="0.011" classname="ErrorCases16MissingPost"/>
+  </testsuite>
+</testsuites>
