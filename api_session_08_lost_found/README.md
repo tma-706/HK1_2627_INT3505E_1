@@ -123,5 +123,6 @@ locust -f .\performance\locustfile.py --headless `
     --html .\reports\C.html
 ```
 
-Record real p95, failure rate and RPS values in
-`performance/analysis.md`; do not invent production claims from local results.
+The completed local results and proposed demo SLO are documented in
+[`performance/analysis.md`](./performance/analysis.md). Detailed Locust reports
+are available at `reports/A.html`, `reports/B.html` and `reports/C.html`.
