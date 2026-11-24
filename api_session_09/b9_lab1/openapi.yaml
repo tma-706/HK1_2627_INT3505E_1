@@ -1,0 +1,151 @@
+openapi: 3.0.3
+
+info:
+  title: Versioned Users API
+  version: 2.0.0
+
+servers:
+  - url: http://127.0.0.1:5000
+
+paths:
+  /api/v1/users/{uid}:
+    get:
+      summary: Get user using v1 schema
+      deprecated: true
+
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        "200":
+          description: User returned using v1 schema
+
+          headers:
+            Sunset:
+              description: Time when API v1 will be retired
+              schema:
+                type: string
+              example: Thu, 31 Dec 2026 23:59:59 GMT
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserV1"
+
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v2/users/{uid}:
+    get:
+      summary: Get user using v2 schema
+
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        "200":
+          description: User returned using v2 schema
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserV2"
+
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v2/users:
+    post:
+      summary: Create a new user
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserV2"
+
+      responses:
+        "201":
+          description: User created
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserV2"
+
+        "400":
+          description: Missing required fields
+
+components:
+  schemas:
+    UserV1:
+      type: object
+      required:
+        - id
+        - full_name
+        - email
+      properties:
+        id:
+          type: integer
+        full_name:
+          type: string
+        email:
+          type: string
+          format: email
+
+    UserV2:
+      type: object
+      required:
+        - id
+        - first_name
+        - last_name
+        - email
+      properties:
+        id:
+          type: integer
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+
+    CreateUserV2:
+      type: object
+      required:
+        - first_name
+        - last_name
+        - email
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+
+  responses:
+    NotFound:
+      description: User not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"

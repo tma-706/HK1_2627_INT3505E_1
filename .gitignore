@@ -5,6 +5,7 @@ __pycache__/
 body.json
 test.txt
 .vscode/
+/tmp/
 
 instance/
 __pycache__/
